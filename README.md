@@ -1,10 +1,9 @@
 
 # mongodb-sharding
 
-//ATENÇÃO: PASSO 0 SOMENTE SE NÃO QUISER PRESERVAR NENHUMA IMAGEM DO DOCKER RODANDO
-0 => Acessar como superuser, parar e excluir todos os atuais containers:
+//ATENÇÃO: PASSO 0 SOMENTE SE NÃO QUISER PRESERVAR NENHUMA IMAGEM DO DOCKER RODANDO ATUALMENTE
 
-    cd /home/daniel/workspace/unisinos/bd2/sharding/sharding
+0 => Acessar como superuser, parar e excluir todos os atuais containers:
 
     sudo su
 
