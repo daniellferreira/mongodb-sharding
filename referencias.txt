@@ -1,0 +1,7 @@
+https://docs.mongodb.com/manual/core/sharded-cluster-config-servers/#sharding-config-server
+https://docs.mongodb.com/manual/tutorial/deploy-shard-cluster/
+https://github.com/justmeandopensource/learn-mongodb/blob/master/sharding/00-setup-sharding-doc.md
+https://github.com/justmeandopensource/learn-mongodb/blob/master/sharding/shard1/docker-compose.yaml
+https://github.com/justmeandopensource/learn-mongodb/blob/master/sharding/config-server/docker-compose.yaml
+https://www.youtube.com/watch?v=7Lp6R4CmuKE
+https://www.youtube.com/watch?v=Rwg26U0Zs1o
