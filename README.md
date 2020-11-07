@@ -1,27 +1,42 @@
 
-# mongodb-sharding
+# MongoDB Sharding
 
-//ATENÇÃO: PASSO 0 SOMENTE SE NÃO QUISER PRESERVAR NENHUMA IMAGEM DO DOCKER RODANDO ATUALMENTE
+Este código fornece um starter para se trabalhar com sharding no MongoDB, siga o passo a passo abaixo:
 
-0 => Acessar como superuser, parar e excluir todos os atuais containers:
+## Sumário
+
+  - [Configurando o Servidor](#configurando-o-servidor)
+  - [Criando o Shard 1](#criando-o-shard-1)
+  - [Criando o Shard 2](#criando-o-shard-2)
+  - [Criando o Mongos Router](#criando-o-mongos-router)
+  - [Adicionando o Sharding e Dados](#adicionando-o-sharding-e-dados)
+
+
+#### ♦️ ATENÇÃO: Se você não quiser preservar nenhuma imagem no docker rodando atualmente, acesse como superuser, pare e exclua todos os atuais containers com os seguinte comandos:
 
     sudo su
 
     docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q) && docker volume prune
 
 
-## CONFIG SERVER
+## Configurando o Servidor
 
-1 => Iniciar instancia que será config server com replicaset
-
+1. Iniciar instancia que será config server com replicaset
+```
     docker-compose -f config-server/docker-compose.yaml up -d
+```
 
-2 => Conectar ao config server
+2. Conectar ao config server
 
+    OBS: Nesta etapa, deve-se utilizar o IP da sua máquina (basta rodar `ipconfig` e verificar o IPv4 Address)
+```
     mongo mongodb://192.168.100.52:40001
+```
 
-3 => Iniciar o replica set do config server
+3. Iniciar o replica set do config server
 
+    OBS: Lembre de modificar o IP para o seu local
+```json
     rs.status()
 
     rs.initiate( {
@@ -36,20 +51,23 @@
     )
 
     rs.status()
+```
 
 
-
-## SHARD 1 REPLICA SET
-4 => Iniciar instancia que será shard1 com replicaset 
-
+## Criando o Shard 1
+1. Para iniciar instância que será shard1 com replicaset, rode o sequinte comando:
+```
     docker-compose -f shard1/docker-compose.yaml up -d
+```
 
-5 => Conectar ao shard1 server
-
+2. Conectar ao shard1 server
+```
     mongo mongodb://192.168.100.52:50001
+```
 
-6 => Iniciar o replica set do shard1 server
+3. Iniciar o replica set do shard1 server
 
+```json
     rs.status()
 
     rs.initiate(
@@ -64,17 +82,23 @@
     )
 
     rs.status()
+```
 
-## SHARD 2 REPLICA SET
+## Criando o Shard 2
 
-7 => Iniciar instancia que será shard2 com replicaset
-docker-compose -f shard2/docker-compose.yaml up -d
+1.  Para iniciar instância que será shard1 com replicaset, rode o sequinte comando:
+```
+    docker-compose -f shard2/docker-compose.yaml up -d
+```
 
-8 => Conectar ao shard2 server
-mongo mongodb://192.168.100.52:50004
+2. Conectar ao shard2 server
+```
+    mongo mongodb://192.168.100.52:50004
+```
 
-9 => Iniciar o replica set do shard2 server
+3. Iniciar o replica set do shard2 server
 
+```json
     rs.status()
 
     rs.initiate(
@@ -89,20 +113,27 @@ mongo mongodb://192.168.100.52:50004
     )
 
     rs.status()
+```
 
+## Criando o Mongos Router
 
-## MONGOS ROUTER
+OBS: Antes de iniciar o container, acesse o arquivo yaml e modifique o IP para o seu local
 
-10 => Iniciar instancia que será Mongos Router
+1. Iniciar instância que será Mongos Router
 
+```
     docker-compose -f mongos/docker-compose.yaml up -d
+```
 
-11 => Conectar ao mongos
+2. Conectar ao mongos
 
+```
     mongo mongodb://192.168.100.52:60000
+```
 
-12 => Adicionar shard1 e shard2 ao cluster
+3. Adicionar shard1 e shard2 ao cluster
 
+```json
     sh.status()
 
     sh.addShard("shard1rs/192.168.100.52:50001,192.168.100.52:50002,192.168.100.52:50003")
@@ -112,22 +143,44 @@ mongo mongodb://192.168.100.52:50004
     sh.addShard("shard2rs/192.168.100.52:50004,192.168.100.52:50005,192.168.100.52:50006")
 
     sh.status()
+```
 
 
-
-## Collection
+## Adicionando o Sharding e Dados
 *Usado como nome do banco de dados "development" para o exemplo*
 
-13 => Criar database "development", criar collection movies
+1. Utilizar o database "development"
 
-14 => Já conectado ao Mongos Router, habilitar o sharding para a database:
-sh.enableSharding("development")
+    OBS: Não é necessário rodar um comando para criar a collection, basta inserir dentro dela.
 
-15 => Habilitar shard para collection e definir shard key:
-sh.shardCollection("development.movies", { title: "hashed" } )
+```
+    use development
+```
 
-16 => importar dataset movies.json
 
-17 => rodar comando para verificar distribuição dos dados
-use development
-db.movies.getShardDistribution()
+2. Já conectado ao Mongos Router, habilitar o sharding para a database:
+
+    OBS: Qualquer coleção que não tiver sharding habilitada, irá para o primary shard.
+
+```json
+    sh.enableSharding("development")
+```
+
+3. Habilitar shard para collection e definir shard key:
+
+```json
+    sh.shardCollection("development.movies", { title: "hashed" } )
+```
+
+4. Importar dataset movies.json na collection
+
+```json
+    mongoimport --host 192.168.1.23:60000 --jsonArray --db development --collection movies --file datasets/movies.json
+```
+
+5. Rodar comando para verificar distribuição dos dados
+
+```
+    use development
+    db.movies.getShardDistribution()
+```

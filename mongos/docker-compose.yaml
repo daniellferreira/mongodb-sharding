@@ -1,4 +1,4 @@
-
+# Update this file with your local IP Address
 version: '3'
 
 services:
@@ -6,6 +6,6 @@ services:
   mongos:
     container_name: mongos
     image: mongo
-    command: mongos --configdb cfgrs/192.168.100.52:40001,192.168.100.52:40002,192.168.100.52:40003 --bind_ip 0.0.0.0 --port 27017
+    command: mongos --configdb cfgrs/192.168.1.23:40001,192.168.1.23:40002,192.168.1.23:40003 --bind_ip 0.0.0.0 --port 27017
     ports:
       - 60000:27017
